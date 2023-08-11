@@ -1,19 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Card from '../components/Card';
+import { shuffleArray, generateWinnerArray } from '../utils/logic';
 
 const Game = () => {
   const emojis = ["😀", "😁", "😂", "🤣", "😃", "😄", "😅", "😆", "😉", "😊", "🥰", "😋", "😎", "😍", "😇", "🙂", "🙃", "😺"];
+  // const shuffledEmojis = shuffleArray([...emojis]);
+  const [flippedIndices, setFlippedIndices] = useState([]);
+  const [winnerArray, setWinnerArray] = useState(generateWinnerArray(emojis.length));
 
-  const shuffleArray = (array) => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+const handleCardClick = (index) => {
+    setFlippedIndices(prevIndices => [...prevIndices, index]);
+
+    if (winnerArray[index]) {
+      setTimeout(() => {
+        setFlippedIndices([]);
+
+        setTimeout(() => {
+          setWinnerArray(generateWinnerArray(emojis.length));
+        }, 600);
+
+      }, 500);
     }
-    return array;
-  };
+};
 
-  const shuffledEmojis = shuffleArray([...emojis]);
-  const emojiCards = shuffledEmojis.map((emoji, index) => <Card key={index} emoji={emoji} />)
+  const emojiCards = emojis.map((emoji, index) => (
+    <Card
+      key={index}
+      emoji={emoji}
+      isWinner={winnerArray[index]}
+      isFlipped={flippedIndices.includes(index)}
+      onCardClick={() => handleCardClick(index)}
+    />
+  ));
 
   return (
     <div className='board container'>
